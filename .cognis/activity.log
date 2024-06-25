@@ -1,1 +1,2 @@
 2024-06-17T14:02:22  feat(core): respect .gitignore when walking
+2024-06-25T09:19:29  perf(docs): add a --format json alias
