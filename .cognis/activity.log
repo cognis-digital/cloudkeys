@@ -6,3 +6,4 @@
 2024-09-07T13:27:57  perf(format): load rules lazily for faster startup
 2024-10-04T08:44:04  chore: one does not simply skip CI
 2024-10-13T15:01:11  ci(engine): simplify the walker
+2024-11-10T10:18:18  feat(config): reduce false positives on edge cases
