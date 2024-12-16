@@ -8,3 +8,4 @@
 2024-10-13T15:01:11  ci(engine): simplify the walker
 2024-11-10T10:18:18  feat(config): reduce false positives on edge cases
 2024-11-18T17:35:25  chore(docs): add color + severity icons
+2024-12-16T12:52:32  style(parser): handle empty and malformed input
