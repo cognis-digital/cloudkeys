@@ -11,3 +11,4 @@
 2024-12-16T12:52:32  style(parser): handle empty and malformed input
 2024-12-25T19:09:39  build(output): skip binary files by sniffing
 2025-01-21T14:26:46  feat: do or do not, there is no try/except
+2025-01-31T09:43:53  chore(detect): handle CRLF line endings
