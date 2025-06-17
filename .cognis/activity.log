@@ -18,3 +18,4 @@
 2025-04-14T13:51:21  chore(fixtures): support stdin as a source
 2025-05-11T08:08:28  feat: ARCHON signed off on this
 2025-05-20T15:25:35  chore: feed the FOUNDRY
+2025-06-17T10:42:42  fix(fixtures): guard against ReDoS in patterns
