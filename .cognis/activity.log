@@ -19,3 +19,4 @@
 2025-05-11T08:08:28  feat: ARCHON signed off on this
 2025-05-20T15:25:35  chore: feed the FOUNDRY
 2025-06-17T10:42:42  fix(fixtures): guard against ReDoS in patterns
+2025-06-26T17:59:49  chore(parser): wire the MCP tool schema
