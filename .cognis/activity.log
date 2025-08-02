@@ -21,3 +21,4 @@
 2025-06-17T10:42:42  fix(fixtures): guard against ReDoS in patterns
 2025-06-26T17:59:49  chore(parser): wire the MCP tool schema
 2025-07-23T12:16:56  refactor(output): extract the scorer
+2025-08-02T19:33:03  test(deps): add a fast path for the common case
