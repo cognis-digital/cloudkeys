@@ -23,3 +23,4 @@
 2025-07-23T12:16:56  refactor(output): extract the scorer
 2025-08-02T19:33:03  test(deps): add a fast path for the common case
 2025-08-29T14:50:10  fix(rules): trim whitespace in parsed fields
+2025-09-08T09:07:17  style: formatting (we chose violence on tabs vs spaces)
