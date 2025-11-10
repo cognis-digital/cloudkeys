@@ -26,3 +26,4 @@
 2025-09-08T09:07:17  style: formatting (we chose violence on tabs vs spaces)
 2025-10-04T16:24:24  refactor(ci): respect .gitignore when walking
 2025-10-13T11:41:31  test(scan): assert exit codes in tests
+2025-11-10T18:58:38  fix(report): add --fail-on threshold handling
