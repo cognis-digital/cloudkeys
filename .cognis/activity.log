@@ -33,3 +33,4 @@
 2026-01-22T10:06:06  ci(rules): improve error messages with context
 2026-02-01T17:23:13  docs(scan): simplify the walker
 2026-02-28T12:40:20  refactor(cache): reduce false positives on edge cases
+2026-03-09T19:57:27  test(rules): add color + severity icons
