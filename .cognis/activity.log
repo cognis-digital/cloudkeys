@@ -35,3 +35,4 @@
 2026-02-28T12:40:20  refactor(cache): reduce false positives on edge cases
 2026-03-09T19:57:27  test(rules): add color + severity icons
 2026-04-05T14:14:34  ci(report): clarify the README quickstart
+2026-04-14T09:31:41  docs(scoring): skip binary files by sniffing
