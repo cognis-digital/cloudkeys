@@ -36,9 +36,11 @@ key triage
 <a name="features"></a>
 ## Features
 
-- ✅ Todo
-- ✅ Fixme
-- ✅ Xxx
+- ✅ Shannon Entropy
+- ✅ Redact
+- ✅ Blast Radius
+- ✅ Scan Text
+- ✅ Scan Path
 - ✅ Runs on Linux/macOS/Windows · Docker · devcontainer
 - ✅ Ports in Python, JavaScript, Go, and Rust (`ports/`)
 
