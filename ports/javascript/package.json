@@ -1,0 +1,10 @@
+{
+  "name": "@cognis/cloudkeys",
+  "version": "0.2.0",
+  "description": "JavaScript port of cloudkeys (Cognis Neural Suite)",
+  "bin": {
+    "cloudkeys": "index.js"
+  },
+  "license": "LicenseRef-COCL-1.0",
+  "type": "module"
+}
