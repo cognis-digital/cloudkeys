@@ -20,6 +20,12 @@ pip install "git+https://github.com/cognis-digital/cloudkeys.git"
 cloudkeys scan .            # → prioritized findings in seconds
 ```
 
+<!-- cognis:layman:start -->
+## What is this?
+
+cloudkeys scans your code, config files, and directories to find accidentally exposed cloud credentials — like AWS access keys, Google Cloud service account keys, or Azure storage keys — before attackers do. You point it at a folder or file, and it immediately tells you what was found, how serious it is, and what to do to fix it. It works without any account or internet connection, so your secrets never leave your machine. It is useful for developers, security teams, and anyone who manages cloud infrastructure and wants to catch credential leaks during code review or as part of automated testing.
+<!-- cognis:layman:end -->
+
 ## Contents
 
 - [Why cloudkeys?](#why) · [Features](#features) · [Quick start](#quick-start) · [Example](#example) · [Architecture](#architecture) · [AI stack](#ai-stack) · [How it compares](#how-it-compares) · [Integrations](#integrations) · [Install anywhere](#install-anywhere) · [Related](#related) · [Contributing](#contributing)
@@ -47,6 +53,42 @@ key triage
 <div align="right"><a href="#top">↑ back to top</a></div>
 
 <a name="quick-start"></a>
+<!-- cognis:install:start -->
+## Install
+
+`cloudkeys` is source-available (not published to PyPI) — every method below installs
+straight from GitHub. Pick whichever you prefer; the one-line scripts auto-detect
+the best tool available on your machine.
+
+**One-liner (Linux / macOS):**
+```sh
+curl -fsSL https://raw.githubusercontent.com/cognis-digital/cloudkeys/HEAD/install.sh | sh
+```
+
+**One-liner (Windows PowerShell):**
+```powershell
+irm https://raw.githubusercontent.com/cognis-digital/cloudkeys/HEAD/install.ps1 | iex
+```
+
+**Or install manually — any one of:**
+```sh
+pipx install "git+https://github.com/cognis-digital/cloudkeys.git"     # isolated (recommended)
+uv tool install "git+https://github.com/cognis-digital/cloudkeys.git"  # uv
+pip install "git+https://github.com/cognis-digital/cloudkeys.git"      # pip
+```
+
+**From source:**
+```sh
+git clone https://github.com/cognis-digital/cloudkeys.git
+cd cloudkeys && pip install .
+```
+
+Then run:
+```sh
+cloudkeys --help
+```
+<!-- cognis:install:end -->
+
 ## Quick start
 
 ```bash
