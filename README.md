@@ -20,6 +20,42 @@ pip install cognis-cloudkeys
 cloudkeys scan .            # → prioritized findings in seconds
 ```
 
+## Usage — step by step
+
+1. **Install:**
+
+   ```bash
+   pip install -e .
+   ```
+
+2. **Scan a path** (files and/or directories, recursively) for leaked AWS/GCP/Azure credentials with the `scan` subcommand. The `paths` argument is variadic and accepts `-` for stdin:
+
+   ```bash
+   cloudkeys scan ./src
+   ```
+
+   Scan multiple targets, or pipe content in:
+
+   ```bash
+   cloudkeys scan ./src ./config
+   git show HEAD | cloudkeys scan -
+   ```
+
+3. **Get machine-readable output** with the global `--format json` flag (placed before the subcommand):
+
+   ```bash
+   cloudkeys --format json scan ./src
+   ```
+
+4. **Read the result.** Each finding lists `SEVERITY`, `DETECTOR`, provider, file:line, the matched secret, its entropy, a `blast:` (blast-radius) assessment, and a `fix:` remediation, plus a severity-count summary. The process **exits 1 when any credential is found**, **0 when clean**, **2 on runtime error with nothing scanned**.
+
+5. **Use it in CI** — block a commit/build that leaks a cloud key:
+
+   ```bash
+   cloudkeys --format json scan . || { echo "Leaked cloud credential detected"; exit 1; }
+   ```
+
+
 ## Contents
 
 - [Why cloudkeys?](#why) · [Features](#features) · [Quick start](#quick-start) · [Example](#example) · [Architecture](#architecture) · [AI stack](#ai-stack) · [How it compares](#how-it-compares) · [Integrations](#integrations) · [Install anywhere](#install-anywhere) · [Related](#related) · [Contributing](#contributing)
