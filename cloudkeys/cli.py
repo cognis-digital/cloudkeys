@@ -69,7 +69,31 @@ def _render_table(result: ScanResult) -> str:
     return "\n".join(lines)
 
 
+# Maximum stdin bytes accepted; larger input is rejected with a clear error.
+_STDIN_MAX_BYTES = 10 * 1024 * 1024  # 10 MB
+
+
+def _die(msg: str) -> int:
+    """Print *msg* to stderr and return exit code 2."""
+    print("cloudkeys error: %s" % msg, file=sys.stderr)
+    return 2
+
+
 def main(argv=None) -> int:
+    try:
+        return _main(argv)
+    except SystemExit:
+        # argparse raises SystemExit on --help/--version and parse errors;
+        # let those propagate normally.
+        raise
+    except KeyboardInterrupt:
+        print("\nInterrupted.", file=sys.stderr)
+        return 2
+    except Exception as exc:  # noqa: BLE001
+        return _die("unexpected error: %s" % exc)
+
+
+def _main(argv=None) -> int:
     parser = _build_parser()
     args = parser.parse_args(argv)
 
@@ -77,7 +101,17 @@ def main(argv=None) -> int:
         combined = ScanResult()
         for path in args.paths:
             if path == "-":
-                text = sys.stdin.read()
+                try:
+                    raw = sys.stdin.buffer.read(_STDIN_MAX_BYTES + 1)
+                except (OSError, AttributeError):
+                    # Fallback when stdin has no .buffer (e.g. StringIO in tests).
+                    raw_str = sys.stdin.read()
+                    raw = raw_str.encode("utf-8", errors="replace")
+                if len(raw) > _STDIN_MAX_BYTES:
+                    return _die(
+                        "stdin exceeds %d-byte limit; pipe a smaller input" % _STDIN_MAX_BYTES
+                    )
+                text = raw.decode("utf-8", errors="replace")
                 combined.files_scanned += 1
                 combined.findings.extend(scan_text(text, source="<stdin>"))
             else:

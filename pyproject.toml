@@ -32,3 +32,10 @@ cloudkeys = "cloudkeys.cli:main"
 
 [tool.hatch.build.targets.wheel]
 packages = ["cloudkeys"]
+
+[tool.ruff]
+line-length = 120
+
+[tool.ruff.lint]
+select = ["F", "E"]
+ignore = ["E501"]

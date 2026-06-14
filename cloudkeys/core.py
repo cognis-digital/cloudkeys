@@ -10,11 +10,19 @@ No network access. No credential is ever used.
 """
 from __future__ import annotations
 
+import json
 import math
 import os
 import re
 from dataclasses import dataclass, field, asdict
 from typing import Callable, Iterable, Optional
+
+# ---------------------------------------------------------------------------
+# Package identity (also importable from the top-level package)
+# ---------------------------------------------------------------------------
+
+TOOL_NAME = "cloudkeys"
+TOOL_VERSION = "0.1.0"
 
 # ---------------------------------------------------------------------------
 # Data model
@@ -276,7 +284,14 @@ def _looks_binary(data: bytes) -> bool:
 
 
 def scan_text(text: str, source: str = "<text>") -> list:
-    """Scan a string, returning a list of Finding objects."""
+    """Scan a string, returning a list of Finding objects.
+
+    Accepts *None* gracefully — treats it as empty input.
+    """
+    if text is None:
+        return []
+    if not isinstance(text, str):
+        raise TypeError("scan_text: 'text' must be a str, got %s" % type(text).__name__)
     findings: list = []
     # Precompute line start offsets for line-number lookup.
     line_starts = [0]
@@ -346,7 +361,13 @@ def scan_path(path: str) -> ScanResult:
         return result
     for fp in _iter_files(path):
         try:
-            if os.path.getsize(fp) > _MAX_BYTES:
+            try:
+                size = os.path.getsize(fp)
+            except OSError:
+                # Special files (pipes, devices) may not have a meaningful size;
+                # skip them rather than crashing.
+                continue
+            if size > _MAX_BYTES:
                 continue
             with open(fp, "rb") as fh:
                 data = fh.read()
@@ -360,3 +381,33 @@ def scan_path(path: str) -> ScanResult:
         result.findings.extend(scan_text(text, source=fp))
     result.findings.sort(key=lambda f: (f.file, f.line, f.detector))
     return result
+
+
+# ---------------------------------------------------------------------------
+# Public convenience API (used by mcp_server and external callers)
+# ---------------------------------------------------------------------------
+
+
+def scan(target: str) -> ScanResult:
+    """Unified entry point: scan a file path, directory, or raw text string.
+
+    If *target* looks like an existing path, delegates to :func:`scan_path`;
+    otherwise treats the value as inline text via :func:`scan_text`.
+    """
+    if not isinstance(target, str):
+        raise TypeError("scan: 'target' must be a str, got %s" % type(target).__name__)
+    if not target:
+        return ScanResult()
+    if os.path.exists(target):
+        return scan_path(target)
+    return ScanResult(
+        findings=scan_text(target, source="<inline>"),
+        files_scanned=1,
+    )
+
+
+def to_json(result: ScanResult) -> str:
+    """Serialize a :class:`ScanResult` to a compact JSON string."""
+    if not isinstance(result, ScanResult):
+        raise TypeError("to_json: expected ScanResult, got %s" % type(result).__name__)
+    return json.dumps(result.to_dict())
