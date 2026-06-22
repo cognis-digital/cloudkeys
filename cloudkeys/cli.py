@@ -4,8 +4,8 @@ Subcommand:
   scan PATH [PATH ...]   Scan files/dirs (or - for stdin) for leaked cloud keys.
 
 Global flags:
-  --version              Print tool version and exit.
-  --format {table,json}  Output format (default: table).
+  --version                     Print tool version and exit.
+  --format {table,json,sarif}   Output format (default: table). sarif = SARIF 2.1.0.
 
 Exit codes:
   0  no findings
@@ -20,6 +20,7 @@ import sys
 
 from . import TOOL_NAME, TOOL_VERSION
 from .core import ScanResult, scan_path, scan_text
+from . import sarif as _sarif
 
 _SEV_ORDER = {"critical": 0, "high": 1, "medium": 2, "low": 3}
 
@@ -30,7 +31,12 @@ def _build_parser() -> argparse.ArgumentParser:
         description="Find leaked AWS/GCP/Azure credentials and classify blast radius (defensive).",
     )
     p.add_argument("--version", action="version", version="%s %s" % (TOOL_NAME, TOOL_VERSION))
-    p.add_argument("--format", choices=("table", "json"), default="table", help="output format")
+    p.add_argument(
+        "--format",
+        choices=("table", "json", "sarif"),
+        default="table",
+        help="output format (table | json | sarif 2.1.0)",
+    )
     sub = p.add_subparsers(dest="command", required=True)
 
     sp = sub.add_parser("scan", help="scan files/dirs (or - for stdin) for leaked keys")
@@ -85,6 +91,8 @@ def main(argv=None) -> int:
 
         if args.format == "json":
             print(json.dumps(combined.to_dict(), indent=2))
+        elif args.format == "sarif":
+            print(_sarif.dumps(combined, TOOL_NAME, TOOL_VERSION))
         else:
             print(_render_table(combined))
 

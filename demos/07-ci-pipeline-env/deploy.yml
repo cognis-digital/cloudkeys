@@ -1,0 +1,21 @@
+# A CI workflow where someone pasted temporary STS creds + a GCP key directly
+# into `env:` instead of using the platform's secret store.
+# NOTE: all values are FAKE, shaped like the real formats.
+
+name: deploy
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      AWS_ACCESS_KEY_ID: ASIAI44QH8DHBEXAMPLE
+      AWS_SESSION_TOKEN: FwoGZXIvYXdzEABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghij0123456789KLMNOPQRSTUVwxyzABCDEFGHIJKLMNOPqrstuvwxyz0123456789demoNotReal
+      GCP_API_KEY: AIzaSyEXAMPLEexampleNotARealGcpKey00000
+    steps:
+      - uses: actions/checkout@v4
+      - name: deploy
+        run: ./deploy.sh

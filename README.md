@@ -41,10 +41,11 @@ cloudkeys scan .            # → prioritized findings in seconds
    git show HEAD | cloudkeys scan -
    ```
 
-3. **Get machine-readable output** with the global `--format json` flag (placed before the subcommand):
+3. **Get machine-readable output** with the global `--format` flag (placed before the subcommand). `json` for any tooling, `sarif` for code-scanning dashboards:
 
    ```bash
-   cloudkeys --format json scan ./src
+   cloudkeys --format json  scan ./src
+   cloudkeys --format sarif scan ./src > cloudkeys.sarif   # SARIF 2.1.0
    ```
 
 4. **Read the result.** Each finding lists `SEVERITY`, `DETECTOR`, provider, file:line, the matched secret, its entropy, a `blast:` (blast-radius) assessment, and a `fix:` remediation, plus a severity-count summary. The process **exits 1 when any credential is found**, **0 when clean**, **2 on runtime error with nothing scanned**.
@@ -58,7 +59,7 @@ cloudkeys scan .            # → prioritized findings in seconds
 
 ## Contents
 
-- [Why cloudkeys?](#why) · [Features](#features) · [Quick start](#quick-start) · [Example](#example) · [Architecture](#architecture) · [AI stack](#ai-stack) · [How it compares](#how-it-compares) · [Integrations](#integrations) · [Install anywhere](#install-anywhere) · [Related](#related) · [Contributing](#contributing)
+- [Why cloudkeys?](#why) · [Features](#features) · [Quick start](#quick-start) · [Example](#example) · [Demos](#demos) · [SARIF export](#sarif) · [Architecture](#architecture) · [AI stack](#ai-stack) · [How it compares](#how-it-compares) · [Integrations](#integrations) · [Install anywhere](#install-anywhere) · [Related](#related) · [Contributing](#contributing)
 
 <a name="why"></a>
 ## Why cloudkeys?
@@ -104,6 +105,59 @@ $ cloudkeys scan .
   [MEDIUM  ] CLO-002  another signal              (./config.yaml)
 
   2 findings · risk score 5 · 38ms
+```
+
+<div align="right"><a href="#top">↑ back to top</a></div>
+
+<a name="demos"></a>
+## Demos — real-world leak scenarios
+
+Runnable, self-contained scenarios under [`demos/`](demos). Each folder has a
+realistic input file (in the format the leak actually shows up in) and a
+`SCENARIO.md` explaining where the data came from, the exact command, what to
+expect, and **how to act**. Every credential is a fake placeholder shaped like
+the real format — cloudkeys never uses a discovered secret.
+
+| Demo | Scenario | Detectors exercised |
+|---|---|---|
+| [`01-basic`](demos/01-basic) | Accidentally committed app config (`.env`) | aws akid/secret, gcp api key, azure storage/client-secret |
+| [`02-clean`](demos/02-clean) | Clean file — no findings | — |
+| [`03-mixed`](demos/03-mixed) | Mixed signal text | — |
+| [`04-aws-credentials-file`](demos/04-aws-credentials-file) | A committed `~/.aws/credentials` with two profiles | aws_access_key_id, aws_secret_access_key |
+| [`05-gcp-api-key`](demos/05-gcp-api-key) | Unrestricted GCP/Firebase API key in a frontend bundle | gcp_api_key |
+| [`06-terraform-tfvars`](demos/06-terraform-tfvars) | Secrets baked into `terraform.tfvars` | azure_client_secret, aws_access_key_id |
+| [`07-ci-pipeline-env`](demos/07-ci-pipeline-env) | Secrets pasted into a CI workflow `env:` | aws_access_key_id (STS), aws_session_token, gcp_api_key |
+| [`08-kubernetes-secret`](demos/08-kubernetes-secret) | A `kind: Secret` manifest in a GitOps repo | private_key_pem, azure_sas_token |
+| [`09-git-diff-precommit`](demos/09-git-diff-precommit) | Block a leak in a pre-commit hook (stdin) | aws_access_key_id, aws_secret_access_key |
+| [`10-dotenv-clean-baseline`](demos/10-dotenv-clean-baseline) | A correct `.env.example` (the green-CI baseline) | — (exit 0) |
+
+```bash
+cloudkeys scan demos/04-aws-credentials-file/credentials          # 4 findings
+git diff --cached | cloudkeys scan -                              # pre-commit gate (demo 09)
+cloudkeys scan demos/10-dotenv-clean-baseline/.env.example        # clean, exit 0
+```
+
+<div align="right"><a href="#top">↑ back to top</a></div>
+
+<a name="sarif"></a>
+## SARIF 2.1.0 export
+
+Emit OASIS [SARIF v2.1.0](https://docs.oasis-open.org/sarif/sarif/v2.1.0/) so
+findings flow into GitHub code-scanning, Azure DevOps, or any SARIF viewer.
+Severities map to SARIF `level` (`error`/`warning`/`note`) and a numeric
+`security-severity` for ranking, one rule per detector.
+
+```bash
+cloudkeys --format sarif scan . > cloudkeys.sarif
+```
+
+In GitHub Actions:
+
+```yaml
+- run: cloudkeys --format sarif scan . > cloudkeys.sarif || true
+- uses: github/codeql-action/upload-sarif@v3
+  with:
+    sarif_file: cloudkeys.sarif
 ```
 
 <div align="right"><a href="#top">↑ back to top</a></div>
