@@ -162,6 +162,64 @@ In GitHub Actions:
 
 <div align="right"><a href="#top">↑ back to top</a></div>
 
+<a name="feeds"></a>
+## Cloud IP attribution — real data feeds (edge / air-gap)
+
+A leaked key is more actionable when you can also say **which cloud the
+endpoints in the same file belong to**. cloudkeys ships an
+edge/air-gap-deployable ingestion layer (`cloudkeys/datafeeds.py`) that pulls
+two **real, authoritative, keyless** public feeds, caches them to disk, and
+re-serves them **offline**:
+
+| feed id | source | what it gives |
+|---|---|---|
+| `aws-ip-ranges` | <https://ip-ranges.amazonaws.com/ip-ranges.json> | AWS CIDR → service + region |
+| `gcp-ip-ranges` | <https://www.gstatic.com/ipranges/cloud.json> | GCP CIDR → service + scope/region |
+
+### The `feeds` command
+
+```bash
+cloudkeys feeds list                       # the two feeds + cache freshness
+cloudkeys feeds update                     # fetch + cache (online)
+cloudkeys feeds get aws-ip-ranges --offline
+cloudkeys feeds attribute 3.4.12.4         # -> AWS AMAZON eu-west-1 (3.4.12.4/32)
+cloudkeys feeds attribute 34.1.208.1 --offline
+```
+
+### Enrich a scan
+
+`--attribute` extracts IPs found while scanning and attributes each to AWS/GCP;
+`--offline` serves from cache only (never touches the network):
+
+```bash
+cloudkeys --format json scan --attribute --offline demos/11-ip-attribution/
+```
+
+The JSON gains an `ip_attributions` map (`ip → {cloud,service,region,cidr}`);
+the table output gets a **Cloud IP attribution** block.
+
+### Edge / air-gap workflow
+
+The cache lives at `COGNIS_FEEDS_CACHE` (default `~/.cache/cognis-feeds`).
+To run on a disconnected enclave, refresh on a connected host, snapshot the
+cache, sneakernet it across, and import:
+
+```bash
+# connected host
+cloudkeys feeds update
+python -m cloudkeys.datafeeds snapshot-export feeds.tar.gz
+
+# air-gapped host
+export COGNIS_FEEDS_CACHE=/opt/cognis-feeds
+python -m cloudkeys.datafeeds snapshot-import feeds.tar.gz
+cloudkeys feeds attribute 3.4.12.4 --offline      # works with zero network
+```
+
+Tests run fully offline against a trimmed fixture cache committed under
+`tests/fixtures/cognis-feeds/`, so CI is green air-gapped.
+
+<div align="right"><a href="#top">↑ back to top</a></div>
+
 <a name="architecture"></a>
 ## Architecture
 

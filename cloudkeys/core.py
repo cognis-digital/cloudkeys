@@ -328,6 +328,30 @@ def scan_text(text: str, source: str = "<text>") -> list:
     return findings
 
 
+# IPv4 + plain IPv6; matches are validated/attributed by the feeds layer.
+_IP_RE = re.compile(
+    r"\b(?:(?:25[0-5]|2[0-4]\d|1?\d?\d)\.){3}(?:25[0-5]|2[0-4]\d|1?\d?\d)\b"
+    r"|\b(?:[0-9A-Fa-f]{1,4}:){2,7}[0-9A-Fa-f]{1,4}\b"
+)
+
+
+def extract_ips(text: str) -> list:
+    """Return distinct, order-preserved IP-looking tokens from text.
+
+    Pure regex extraction (no validation here) — :mod:`cloudkeys.feeds`
+    validates each token and attributes it to AWS/GCP. Used to give a leaked
+    credential cloud context.
+    """
+    seen = set()
+    out = []
+    for m in _IP_RE.finditer(text):
+        tok = m.group(0)
+        if tok not in seen:
+            seen.add(tok)
+            out.append(tok)
+    return out
+
+
 def _iter_files(root: str) -> Iterable[str]:
     if os.path.isfile(root):
         yield root
