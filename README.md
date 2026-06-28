@@ -20,6 +20,61 @@ pip install cognis-cloudkeys
 cloudkeys scan .            # → prioritized findings in seconds
 ```
 
+
+<!-- cognis:example:start -->
+## 🔎 Example output
+
+Real, reproducible output from the tool — runs offline:
+
+```console
+$ cloudkeys-emit --version
+cloudkeys 0.1.0
+```
+
+```console
+$ cloudkeys-emit --help
+usage: cloudkeys [-h] [--version] [--format {table,json,sarif}]
+                 {scan,feeds} ...
+
+Find leaked AWS/GCP/Azure credentials and classify blast radius (defensive).
+
+positional arguments:
+  {scan,feeds}
+    scan                scan files/dirs (or - for stdin) for leaked keys
+    feeds               cloud IP-range data feeds (real, keyless, offline-
+                        capable)
+
+options:
+  -h, --help            show this help message and exit
+  --version             show program's version number and exit
+  --format {table,json,sarif}
+                        output format (table | json | sarif 2.1.0)
+```
+
+> Blocks above are real `cloudkeys` output — reproduce them from a clone.
+
+**Sample result format** _(illustrative values — run on your own data for real findings):_
+
+```
+{
+  "cloudkeys": {
+    "platform": "stix",
+    "data": [
+      {
+        "id": "1234567890abcdef",
+        "type": "indicator",
+        "name": "Example Indicator",
+        "description": "This is an example indicator.",
+        "created_by_ref": "user1",
+        "modified_by_ref": "user2"
+      }
+    ]
+  }
+}
+```
+
+<!-- cognis:example:end -->
+
 ## Usage — step by step
 
 1. **Install:**

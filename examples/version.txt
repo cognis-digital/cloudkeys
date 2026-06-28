@@ -1,0 +1,3 @@
+$ cloudkeys-emit --version
+
+cloudkeys 0.1.0
